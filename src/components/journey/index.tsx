@@ -18,7 +18,7 @@ Verify user attributes (age, nationality) on-chain without revealing sensitive d
 Leverages existing biometric passports/IDs
 `
 
-export function Journey() {
+export function Journey({ videoId }: { videoId: string }) {
   const [state, setState] = useState<JourneyState>("analyzing");
   const [showVideo, setShowVideo] = useState(true);
 
@@ -89,7 +89,7 @@ export function Journey() {
         <Button variant="outline" size="sm" onClick={() => setShowVideo(!showVideo)} className="mb-4">
             {showVideo ? 'Hide Video' : 'Show Video'}
         </Button>
-      {showVideo && <YoutubeEmbed embedId="dQw4w9WgXcQ" />}
+      {showVideo && <YoutubeEmbed embedId={videoId} />}
 
       <div className="my-6">
         <div className="flex items-center gap-4">
