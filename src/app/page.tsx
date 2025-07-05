@@ -10,15 +10,50 @@ import Image from 'next/image'
 export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [youtubeUrl, setYoutubeUrl] = useState('')
+  const [error, setError] = useState('')
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen)
   }
 
+  const isValidYouTubeUrl = (url: string) => {
+    if (!url.trim()) return true // Empty URL is valid (no error)
+    
+    const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com\/(watch\?v=|embed\/|v\/)|youtu\.be\/)[\w-]+(&[\w=]*)?$/
+    return youtubeRegex.test(url.trim())
+  }
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value
+    setYoutubeUrl(value)
+    
+    // Clear error when user starts typing
+    if (error) {
+      setError('')
+    }
+    
+    // Show error for invalid URLs (but not for empty input)
+    if (value.trim() && !isValidYouTubeUrl(value)) {
+      setError('invalid_url')
+    }
+  }
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    // Handle YouTube URL submission
+    
+    if (!youtubeUrl.trim()) {
+      setError('Please paste a valid YouTube URL')
+      return
+    }
+    
+    if (!isValidYouTubeUrl(youtubeUrl)) {
+      setError('invalid_url')
+      return
+    }
+    
+    // Handle valid YouTube URL submission
     console.log('YouTube URL:', youtubeUrl)
+    setError('')
   }
 
   return (
@@ -142,16 +177,46 @@ export default function Home() {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="w-full max-w-md mx-auto">
+          <form onSubmit={handleSubmit} className="w-full max-w-md mx-auto space-y-4">
             <div className="relative">
               <Input
                 type="url"
                 placeholder="Paste YouTube video URL ..."
                 value={youtubeUrl}
-                onChange={(e) => setYoutubeUrl(e.target.value)}
-                className="w-full h-12 pl-4 pr-4 text-base border-2 border-accent/50 focus:border-accent focus:ring-accent/20 rounded-lg bg-background/50 backdrop-blur-sm"
+                onChange={handleInputChange}
+                className={`w-full h-12 pl-4 pr-4 text-base border-2 focus:ring-accent/20 rounded-lg bg-background/50 backdrop-blur-sm ${
+                  error ? 'border-red-500 focus:border-red-500' : 'border-accent/50 focus:border-accent'
+                }`}
               />
             </div>
+            
+            {error && (
+              <div className="w-full max-w-md mx-auto">
+                {error === 'invalid_url' ? (
+                  <div className="bg-slate-800 border border-purple-500/30 rounded-lg p-4 text-left">
+                    <div className="text-purple-400 font-medium text-sm mb-2">
+                      Please paste a valid YouTube URL in one of these formats:
+                    </div>
+                    <div className="space-y-1 text-purple-300 text-sm font-mono">
+                      <div className="flex items-center gap-2">
+                        <span className="text-purple-500">›</span>
+                        <span>https://www.youtube.com/watch?v=...</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-purple-500">›</span>
+                        <span>https://youtu.be/...</span>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="bg-slate-800 border border-purple-500/30 rounded-lg p-4 text-center">
+                    <div className="text-purple-400 font-medium text-sm">
+                      {error}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </form>
         </div>
 
