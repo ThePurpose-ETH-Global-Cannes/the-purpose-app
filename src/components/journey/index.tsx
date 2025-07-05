@@ -10,6 +10,12 @@ import { YoutubeEmbed } from "./youtube-embed";
 
 type JourneyState = "analyzing" | "loading" | "content";
 
+interface TranscriptItem {
+  text: string;
+  duration: number;
+  offset: number;
+}
+
 const MOCKED_DATA = `
 ### ZK Identity Verification
 Verify user attributes (age, nationality) on-chain without revealing sensitive data using zero-knowledge proofs.
@@ -21,6 +27,8 @@ Leverages existing biometric passports/IDs
 export function Journey({ videoId }: { videoId: string }) {
   const [state, setState] = useState<JourneyState>("analyzing");
   const [showVideo, setShowVideo] = useState(true);
+  const [insights, setInsights] = useState<TranscriptItem[] | null>(null);
+  const [loadingInsights, setLoadingInsights] = useState(false);
 
   useEffect(() => {
     const timer1 = setTimeout(() => {
@@ -36,6 +44,27 @@ export function Journey({ videoId }: { videoId: string }) {
       clearTimeout(timer2);
     };
   }, []);
+
+  const getInsights = async () => {
+    setLoadingInsights(true);
+    try {
+      const response = await fetch(`/api/youtube-transcript?videoId=${videoId}`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch transcript");
+      }
+      const data = await response.json();
+      setInsights(data);
+      console.log("--- YOUTUBE TRANSCRIPT ---");
+      // Log an excerpt of the transcript
+      console.log(data.slice(0, 5).map((item: TranscriptItem) => item.text).join(" "));
+      console.log("--- END YOUTUBE TRANSCRIPT ---");
+    } catch (error) {
+      console.error("Error fetching insights:", error);
+      // Maybe show a toast here
+    } finally {
+        setLoadingInsights(false);
+    }
+  };
 
   if (state === "analyzing") {
     return (
@@ -77,7 +106,25 @@ export function Journey({ videoId }: { videoId: string }) {
     {
         value: "insights",
         label: "Insights",
-        content: <p className="mt-6 text-muted-foreground">Insights will appear here.</p>
+        content: (
+            <div className="mt-6">
+                <Button onClick={getInsights} disabled={loadingInsights}>
+                    {loadingInsights ? <LoadingSpinner size={20} className="mr-2" /> : null}
+                    Get Insights
+                </Button>
+                {insights && (
+                    <div className="mt-4">
+                        <h3 className="text-lg font-bold mb-2">Transcript Excerpt</h3>
+                        <div className="max-h-60 overflow-y-auto bg-muted/40 p-4 rounded-md text-sm">
+                            {insights.slice(0, 20).map((item: TranscriptItem, index: number) => (
+                                <p key={index}>{item.text}</p>
+                            ))}
+                             {insights.length > 20 && <p className="text-center mt-2">...</p>}
+                        </div>
+                    </div>
+                )}
+            </div>
+        )
     }
   ]
 
