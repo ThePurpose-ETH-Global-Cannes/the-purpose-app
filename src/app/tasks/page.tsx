@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { usePrivy } from '@privy-io/react-auth';
+import { Loader2 } from 'lucide-react';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
 
 interface Task {
   id: string;
@@ -25,31 +27,31 @@ export default function TasksPage() {
   const [loading, setLoading] = useState(false);
   const [completingTask, setCompletingTask] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-    const [success, setSuccess] = useState<string | null>(null);
-    
-    const loadProgress = useCallback(async () => {
-        if (!user?.wallet?.address || !user.id) return;
-    
-        setLoading(true);
-        setError(null);
-    
-        try {
-          const response = await fetch(
-            `/api/complete-requirements?userAddress=${user.wallet.address}&privyId=${user.id}`
-          );
-    
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-    
-          const data = await response.json();
-          setProgress(data);
-        } catch (err) {
-          setError(err instanceof Error ? err.message : 'Failed to load progress');
-        } finally {
-          setLoading(false);
-        }
-      }, [user]);
+  const [success, setSuccess] = useState<string | null>(null);
+  
+  const loadProgress = useCallback(async () => {
+    if (!user?.wallet?.address || !user.id) return;
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch(
+        `/api/complete-requirements?userAddress=${user.wallet.address}&privyId=${user.id}`
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setProgress(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load progress');
+    } finally {
+      setLoading(false);
+    }
+  }, [user]);
 
   // Load user progress when component mounts
   useEffect(() => {
@@ -57,8 +59,6 @@ export default function TasksPage() {
       loadProgress();
     }
   }, [ready, authenticated, user, loadProgress]);
-
-
 
   const completeTask = async (taskId: string) => {
     if (!user?.wallet?.address || !user.id) return;
@@ -141,7 +141,7 @@ export default function TasksPage() {
   if (!ready) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <LoadingSpinner />
       </div>
     );
   }
@@ -221,9 +221,16 @@ export default function TasksPage() {
                   <button
                     onClick={fastForwardRequirements}
                     disabled={loading}
-                    className="px-4 py-2 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-lg hover:from-orange-600 hover:to-red-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 text-sm font-medium"
+                    className="px-4 py-2 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-lg hover:from-orange-600 hover:to-red-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 text-sm font-medium flex items-center"
                   >
-                    {loading ? 'Fast Forwarding...' : '⚡ Fast Forward'}
+                    {loading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Fast Forwarding...
+                      </>
+                    ) : (
+                      '⚡ Fast Forward'
+                    )}
                   </button>
                 </div>
               )}
@@ -262,11 +269,7 @@ export default function TasksPage() {
               </div>
             )}
 
-            {loading && !progress && (
-              <div className="flex justify-center items-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-              </div>
-            )}
+            {loading && !progress && <LoadingSpinner text="Loading your progress..." />}
 
             {/* Tasks List */}
             {progress && (
@@ -312,18 +315,25 @@ export default function TasksPage() {
                             {task.description}
                           </p>
                         </div>
-                        <div className="ml-4">
+                        <div className="ml-auto">
                           {task.completed ? (
-                            <span className="px-3 py-2 bg-green-100 text-green-800 rounded-lg text-sm font-medium">
-                              Completed
-                            </span>
+                            <div className="flex items-center text-green-600">
+                              <span className="font-medium">Completed</span>
+                            </div>
                           ) : (
                             <button
                               onClick={() => completeTask(task.id)}
                               disabled={completingTask === task.id}
-                              className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
+                              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium flex items-center"
                             >
-                              {completingTask === task.id ? 'Completing...' : 'Complete'}
+                              {completingTask === task.id ? (
+                                <>
+                                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                  Completing...
+                                </>
+                              ) : (
+                                `Complete (${task.points} pts)`
+                              )}
                             </button>
                           )}
                         </div>

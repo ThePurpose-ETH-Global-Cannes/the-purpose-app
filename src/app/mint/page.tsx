@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { usePrivy } from '@privy-io/react-auth';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import { Loader2 } from 'lucide-react';
 
 interface MintStatus {
   eligible: boolean;
@@ -38,39 +40,39 @@ export default function MintPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-    const [step, setStep] = useState<'check' | 'generate' | 'mint' | 'complete'>('check');
-    
-    const checkMintStatus = useCallback(async () => {
-        if (!user?.wallet?.address || !user.id) return;
-    
-        setLoading(true);
-        setError(null);
-    
-        try {
-          const response = await fetch(
-            `/api/mint-signature?userAddress=${user.wallet.address}&privyId=${user.id}`
-          );
-    
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-    
-          const data = await response.json();
-          setMintStatus(data);
-          
-          if (data.hasMinted) {
-            setStep('complete');
-          } else if (data.eligible) {
-            setStep('generate');
-          } else {
-            setStep('check');
-          }
-        } catch (err) {
-          setError(err instanceof Error ? err.message : 'Failed to check mint status');
-        } finally {
-          setLoading(false);
-        }
-      }, [user]);
+  const [step, setStep] = useState<'check' | 'generate' | 'mint' | 'complete'>('check');
+  
+  const checkMintStatus = useCallback(async () => {
+    if (!user?.wallet?.address || !user.id) return;
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch(
+        `/api/mint-signature?userAddress=${user.wallet.address}&privyId=${user.id}`
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setMintStatus(data);
+      
+      if (data.hasMinted) {
+        setStep('complete');
+      } else if (data.eligible) {
+        setStep('generate');
+      } else {
+        setStep('check');
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to check mint status');
+    } finally {
+      setLoading(false);
+    }
+  }, [user]);
 
   // Check minting status when component loads
   useEffect(() => {
@@ -140,7 +142,7 @@ export default function MintPage() {
   if (!ready) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <LoadingSpinner />
       </div>
     );
   }
@@ -250,120 +252,114 @@ export default function MintPage() {
             )}
 
             {/* Step Content */}
-            {step === 'check' && mintStatus && (
-              <div className="text-center">
-                <div className="w-16 h-16 mx-auto mb-4 bg-red-100 rounded-full flex items-center justify-center">
-                  <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-2">Not Eligible</h3>
-                <p className="text-gray-600 mb-4">{mintStatus.reason}</p>
-                <div className="space-y-3">
-                  <button
-                    onClick={checkMintStatus}
-                    disabled={loading}
-                    className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {loading ? 'Checking...' : 'Check Again'}
-                  </button>
-                  <button
-                    onClick={() => window.location.href = '/tasks'}
-                    className="w-full px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-                  >
-                    ✅ Complete Tasks to Become Eligible
-                  </button>
-                  <p className="text-sm text-gray-500 mt-2">
-                    💡 Visit the tasks page and use the Fast Forward button for instant eligibility
-                  </p>
-                </div>
-              </div>
+            {!mintStatus && loading && (
+              <LoadingSpinner text="Checking your minting status..." />
             )}
 
-            {step === 'generate' && mintStatus && (
-              <div className="text-center">
-                <div className="w-16 h-16 mx-auto mb-4 bg-green-100 rounded-full flex items-center justify-center">
-                  <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                </div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-2">Eligible to Mint!</h3>
-                <p className="text-gray-600 mb-4">{mintStatus.reason}</p>
-                <button
-                  onClick={generateSignature}
-                  disabled={loading}
-                  className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {loading ? 'Generating...' : 'Generate Mint Signature'}
-                </button>
-              </div>
-            )}
-
-            {step === 'mint' && signatureData && (
-              <div className="space-y-6">
-                <div className="text-center">
-                  <div className="w-16 h-16 mx-auto mb-4 bg-blue-100 rounded-full flex items-center justify-center">
-                    <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
-                    </svg>
+            {mintStatus && (
+              <div>
+                {/* Step 1: Check eligibility */}
+                {step === 'check' && (
+                  <div className="text-center">
+                    {!mintStatus.eligible && !mintStatus.hasMinted && (
+                      <div className="mb-4">
+                        <p className="text-lg font-semibold text-red-600">
+                          Not Eligible to Mint
+                        </p>
+                        <p className="text-gray-600">{mintStatus.reason}</p>
+                      </div>
+                    )}
+                    <button
+                      onClick={checkMintStatus}
+                      disabled={loading}
+                      className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-base font-medium flex items-center justify-center"
+                    >
+                      {loading ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Checking...
+                        </>
+                      ) : (
+                        'Check Again'
+                      )}
+                    </button>
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-800 mb-2">Ready to Mint</h3>
-                  <p className="text-gray-600 mb-4">Your signature has been generated. Click below to mint your NFT.</p>
-                  <button
-                    onClick={simulateMint}
-                    disabled={loading}
-                    className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {loading ? 'Minting...' : '🎨 Mint NFT'}
-                  </button>
-                </div>
+                )}
 
-                {/* Signature Details */}
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <h4 className="font-semibold text-gray-800 mb-2">Signature Details</h4>
-                  <div className="space-y-2 text-sm">
-                    <div>
-                      <span className="font-medium text-gray-700">Token ID:</span>
-                      <span className="ml-2 text-gray-600">{signatureData.message.tokenId}</span>
+                {/* Step 2: Generate Signature */}
+                {step === 'generate' && mintStatus.eligible && (
+                  <div className="text-center">
+                    <p className="text-lg font-semibold text-green-600 mb-4">
+                      You are eligible to mint!
+                    </p>
+                    <button
+                      onClick={generateSignature}
+                      disabled={loading}
+                      className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-base font-medium flex items-center justify-center"
+                    >
+                      {loading ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Generating...
+                        </>
+                      ) : (
+                        'Generate Mint Signature'
+                      )}
+                    </button>
+                  </div>
+                )}
+
+                {/* Step 3: Mint NFT */}
+                {step === 'mint' && signatureData && (
+                  <div className="text-center">
+                    <p className="text-lg font-semibold text-blue-600 mb-4">
+                      Signature received. Ready to mint.
+                    </p>
+                    <button
+                      onClick={simulateMint}
+                      disabled={loading}
+                      className="px-6 py-3 bg-teal-600 text-white rounded-lg hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-base font-medium flex items-center justify-center"
+                    >
+                      {loading ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Minting...
+                        </>
+                      ) : (
+                        '🎨 Mint NFT'
+                      )}
+                    </button>
+                  </div>
+                )}
+
+                {/* Step 4: Complete */}
+                {step === 'complete' && (
+                  <div className="text-center">
+                    <div className="w-16 h-16 mx-auto mb-4 bg-green-100 rounded-full flex items-center justify-center">
+                      <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                      </svg>
                     </div>
-                    <div>
-                      <span className="font-medium text-gray-700">Deadline:</span>
-                      <span className="ml-2 text-gray-600">{new Date(signatureData.message.deadline * 1000).toLocaleString()}</span>
-                    </div>
-                    <div>
-                      <span className="font-medium text-gray-700">Signature:</span>
-                      <span className="ml-2 text-gray-600 font-mono text-xs break-all">{signatureData.signature}</span>
+                    <h3 className="text-lg font-semibold text-gray-800 mb-2">Congratulations!</h3>
+                    <p className="text-gray-600 mb-4">
+                      {mintStatus?.hasMinted ? 'You have already minted your Purpose NFT.' : 'Your Purpose NFT has been successfully minted!'}
+                    </p>
+                    <div className="space-y-3">
+                      <button
+                        onClick={() => window.location.href = '/metadata-demo'}
+                        className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                      >
+                        View NFT Metadata
+                      </button>
+                      <button
+                        onClick={() => window.location.href = '/'}
+                        className="w-full px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
+                      >
+                        Back to Home
+                      </button>
                     </div>
                   </div>
-                </div>
-              </div>
-            )}
-
-            {step === 'complete' && (
-              <div className="text-center">
-                <div className="w-16 h-16 mx-auto mb-4 bg-green-100 rounded-full flex items-center justify-center">
-                  <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-                  </svg>
-                </div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-2">Congratulations!</h3>
-                <p className="text-gray-600 mb-4">
-                  {mintStatus?.hasMinted ? 'You have already minted your Purpose NFT.' : 'Your Purpose NFT has been successfully minted!'}
-                </p>
-                <div className="space-y-3">
-                  <button
-                    onClick={() => window.location.href = '/metadata-demo'}
-                    className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                  >
-                    View NFT Metadata
-                  </button>
-                  <button
-                    onClick={() => window.location.href = '/'}
-                    className="w-full px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
-                  >
-                    Back to Home
-                  </button>
-                </div>
+                )}
               </div>
             )}
           </div>

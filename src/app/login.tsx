@@ -1,12 +1,13 @@
 'use client';
 import {usePrivy} from '@privy-io/react-auth';
 import {Button} from '@/components/ui/button';
+import {LoadingSpinner} from '@/components/ui/loading-spinner';
 
 export default function Login() {
   const {ready, authenticated, user, logout} = usePrivy();
 
   if (!ready) {
-    return <p className="text-gray-600 dark:text-gray-400">Loading...</p>;
+    return <LoadingSpinner text="Loading..." />;
   }
 
   return (
