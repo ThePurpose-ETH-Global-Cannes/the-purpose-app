@@ -48,19 +48,34 @@ export function Journey({ videoId }: { videoId: string }) {
   const getInsights = async () => {
     setLoadingInsights(true);
     try {
+      console.log("🎬 Fetching transcript for videoId:", videoId);
       const response = await fetch(`/api/youtube-transcript?videoId=${videoId}`);
+      
       if (!response.ok) {
-        throw new Error("Failed to fetch transcript");
+        const errorData = await response.json();
+        throw new Error(`Failed to fetch transcript: ${errorData.error}`);
       }
+      
       const data = await response.json();
       setInsights(data);
-      console.log("--- YOUTUBE TRANSCRIPT ---");
-      // Log an excerpt of the transcript
-      console.log(data.slice(0, 5).map((item: TranscriptItem) => item.text).join(" "));
-      console.log("--- END YOUTUBE TRANSCRIPT ---");
+      
+      console.log("📜 --- YOUTUBE TRANSCRIPT EXCERPT ---");
+      console.log("📊 Total transcript items:", data.length);
+      
+      // Log first paragraph (first 10 items or until we have a good amount of text)
+      const excerpt = data.slice(0, 10).map((item: TranscriptItem) => item.text).join(" ");
+      console.log("📝 First paragraph:", excerpt);
+      
+      // Log the full first 5 items with timestamps
+      console.log("⏱️ First 5 items with timestamps:");
+      data.slice(0, 5).forEach((item: TranscriptItem, index: number) => {
+        console.log(`${index + 1}. [${item.offset}s] ${item.text}`);
+      });
+      
+      console.log("📜 --- END YOUTUBE TRANSCRIPT EXCERPT ---");
+      
     } catch (error) {
-      console.error("Error fetching insights:", error);
-      // Maybe show a toast here
+      console.error("❌ Error fetching insights:", error);
     } finally {
         setLoadingInsights(false);
     }
