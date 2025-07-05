@@ -4,6 +4,7 @@ import "./globals.css";
 import Providers from "./privy-provider";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ThemeScript } from "@/components/theme-script";
+import { GlobalProvider } from "@/contexts/global-context";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -24,7 +25,9 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <ThemeProvider>
-          <Providers>{children}</Providers>
+          <GlobalProvider>
+            <Providers>{children}</Providers>
+          </GlobalProvider>
         </ThemeProvider>
       </body>
     </html>
