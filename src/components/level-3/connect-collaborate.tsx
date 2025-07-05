@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react'
 import { CheckCircle, Circle } from "lucide-react"
 import { Card } from '@/components/ui/card'
@@ -131,8 +130,6 @@ export default function ConnectCollaborate({ setStep }: ConnectCollaborateProps)
           <Card className="bg-card border-border px-3 md:px-6">
             <h3 className="text-lg font-medium">Brief BIO for connection</h3>
             <Textarea
-              mode="simple"
-              label=""
               placeholder="Write a short bio about what you hope to gain from connecting with others..."
               value={bio}
               onChange={(e) => setBio(e.target.value)}
