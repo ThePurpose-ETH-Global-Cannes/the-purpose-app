@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -9,31 +9,96 @@ import { usePrivy } from '@privy-io/react-auth'
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { MainLayout } from '@/components/layout/main-layout'
 
+interface VideoMetadata {
+  url: string;
+  title: string;
+  author_name: string;
+  author_url: string;
+  provider_name: string;
+  provider_url: string;
+  thumbnail_url: string;
+  thumbnail_width: number;
+  thumbnail_height: number;
+  version: string;
+  width: number;
+  height: number;
+  type: string;
+  html: string;
+}
+
 export default function Home() {
   const { ready, authenticated, login } = usePrivy()
   const [youtubeUrl, setYoutubeUrl] = useState('')
   const [error, setError] = useState('')
+  const [videoMetadata, setVideoMetadata] = useState<VideoMetadata | null>(null)
+  const [isFetchingMetadata, setIsFetchingMetadata] = useState(false)
   const router = useRouter()
 
   const isValidYouTubeUrl = (url: string) => {
-    if (!url.trim()) return false
+    if (!url.trim()) return true // Empty URL is valid (no error)
     const youtubeRegex =
       /^(https?:\/\/)?(www\.)?(youtube\.com\/(watch\?v=|embed\/|v\/)|youtu\.be\/)[\w-]+(&[\w=]*)?$/
     return youtubeRegex.test(url.trim())
   }
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = e.target
-    setYoutubeUrl(value)
-    if (isValidYouTubeUrl(value) || !value.trim()) {
-      setError('')
+  useEffect(() => {
+    const fetchMetadata = async () => {
+      if (isValidYouTubeUrl(youtubeUrl) && youtubeUrl.trim()) {
+        setIsFetchingMetadata(true)
+        setVideoMetadata(null)
+        setError('')
+        try {
+          const response = await fetch(
+            `https://noembed.com/embed?url=${youtubeUrl}`,
+          )
+          const data = await response.json()
+          if (data.error) {
+            setError(
+              'Could not fetch video details. The video might be private or deleted.',
+            )
+            setVideoMetadata(null)
+          } else {
+            setVideoMetadata(data)
+          }
+        } catch (e) {
+          console.error('Failed to fetch video metadata:', e)
+          setError('Failed to fetch video metadata.')
+          setVideoMetadata(null)
+        } finally {
+          setIsFetchingMetadata(false)
+        }
+      } else {
+        setVideoMetadata(null)
+        if (youtubeUrl.trim() && !isValidYouTubeUrl(youtubeUrl)) {
+          setError('invalid_url')
+        } else {
+          setError('')
+        }
+      }
     }
+
+    const handler = setTimeout(() => {
+      if (youtubeUrl.trim()) {
+        fetchMetadata()
+      } else {
+        setVideoMetadata(null)
+        setError('')
+      }
+    }, 500)
+
+    return () => {
+      clearTimeout(handler)
+    }
+  }, [youtubeUrl])
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setYoutubeUrl(e.target.value)
   }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!isValidYouTubeUrl(youtubeUrl)) {
+    if (!videoMetadata || !isValidYouTubeUrl(youtubeUrl)) {
       if (!youtubeUrl.trim()) {
         setError('Please paste a valid YouTube URL')
       } else {
@@ -123,7 +188,7 @@ export default function Home() {
             <Button
               type="submit"
               className="w-full sm:w-auto bg-purple-600 px-8 py-3 text-lg text-white hover:bg-purple-700 h-12 flex-shrink-0"
-              disabled={!youtubeUrl.trim() || !!error}
+              disabled={isFetchingMetadata || !youtubeUrl.trim() || !!error}
             >
               Get Insights
             </Button>
@@ -157,6 +222,33 @@ export default function Home() {
             </div>
           )}
         </form>
+
+        {isFetchingMetadata && <div className="mt-8"><LoadingSpinner text="Getting video details..." /></div>}
+
+        {videoMetadata && (
+          <div className="w-full max-w-3xl mx-auto mt-8 space-y-4 text-left animate-fade-in">
+            <div className="aspect-video overflow-hidden rounded-lg shadow-lg border border-purple-500/20">
+              <div
+                className="w-full h-full [&>iframe]:w-full [&>iframe]:h-full"
+                dangerouslySetInnerHTML={{ __html: videoMetadata.html }}
+              />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold">{videoMetadata.title}</h2>
+              <p className="text-muted-foreground mt-1">
+                by{' '}
+                <a
+                  href={videoMetadata.author_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-purple-400 hover:underline"
+                >
+                  {videoMetadata.author_name}
+                </a>
+              </p>
+            </div>
+          </div>
+        )}
       </div>
     </MainLayout>
   )

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from "react";
+import { useParams } from 'next/navigation'
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { Markdown } from "@/components/ui/markdown";
 import { Button } from "@/components/ui/button";
@@ -19,7 +20,10 @@ Verify user attributes (age, nationality) on-chain without revealing sensitive d
 Leverages existing biometric passports/IDs
 `
 
-export default function JourneyPage({ params }: { params: { journeyId: string } }) {
+export default function JourneyPage() {
+  const params = useParams()
+  const journeyId = params.journeyId as string
+
   const [state, setState] = useState<JourneyState>("analyzing");
   const [showVideo, setShowVideo] = useState(true);
   const [streamedContent, setStreamedContent] = useState("");
@@ -54,7 +58,7 @@ export default function JourneyPage({ params }: { params: { journeyId: string } 
 
   const renderLoadingState = (text: string) => (
     <MainLayout>
-      <div className="w-full h-full flex flex-col items-center justify-center pt-24">
+      <div className="w-full h-full flex flex-col items-center justify-center pt-24 px-4">
         <h1 className="text-2xl font-bold tracking-tight mb-4 text-center">
             Remi Colin I Verify Identities Onchain Using Self SDK I ETHGlobal Cannes 2025
         </h1>
@@ -77,11 +81,11 @@ export default function JourneyPage({ params }: { params: { journeyId: string } 
         label: "Key Concepts",
         content: (
             <div className="mt-6">
-                <div className="flex justify-between items-center">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <h2 className="text-xl font-bold">Key Concepts</h2>
-                    <Button>Now Set Your Goal</Button>
+                    <Button className="w-full sm:w-auto">Now Set Your Goal</Button>
                 </div>
-                <Markdown content={streamedContent} />
+                <Markdown content={streamedContent} className="mt-4" />
             </div>
         )
     },
@@ -99,20 +103,33 @@ export default function JourneyPage({ params }: { params: { journeyId: string } 
 
   return (
     <MainLayout>
-        <div className="w-full max-w-2xl mx-auto p-4 md:p-6">
-            <h1 className="text-2xl font-bold tracking-tight mb-4">
+        <div className="w-full max-w-4xl mx-auto p-4 md:p-6">
+            <h1 className="text-2xl md:text-3xl font-bold tracking-tight mb-4">
                 Remi Colin I Verify Identities Onchain Using Self SDK I ETHGlobal Cannes 2025
             </h1>
             <Button variant="outline" size="sm" onClick={() => setShowVideo(!showVideo)} className="mb-4">
                 {showVideo ? 'Hide Video' : 'Show Video'}
             </Button>
-            {showVideo && <YoutubeEmbed embedId={params.journeyId} />}
+            {showVideo && <YoutubeEmbed embedId={journeyId} />}
 
             <div className="my-6">
-                <div className="flex items-center gap-4">
-                    <span className="text-sm font-bold bg-primary/20 text-primary px-2 py-1 rounded-full">✨ 1 XP</span>
-                    <Progress value={14} className="w-full" />
-                    <span className="text-sm text-muted-foreground whitespace-nowrap">0/7 Levels Complete</span>
+                <div className="flex items-center gap-2 sm:gap-4">
+                    <div className="flex-shrink-0">
+                      <div className="relative w-16 h-16">
+                          <div className="absolute inset-0 rounded-full bg-purple-600/20 flex items-center justify-center">
+                              <div className="w-12 h-12 rounded-full bg-purple-600/30 flex items-center justify-center">
+                                  <span className="text-2xl">✨</span>
+                              </div>
+                          </div>
+                          <div className="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 bg-primary text-primary-foreground rounded-full h-6 w-6 flex items-center justify-center text-xs font-bold">
+                              1
+                          </div>
+                      </div>
+                    </div>
+                    <div className="w-full">
+                        <Progress value={14} className="h-2.5" />
+                        <p className="text-sm text-muted-foreground mt-2 text-right">0/7 Levels Complete</p>
+                    </div>
                 </div>
             </div>
             
