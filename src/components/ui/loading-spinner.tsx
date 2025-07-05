@@ -3,14 +3,16 @@ import { cn } from "@/lib/utils"
 interface LoadingSpinnerProps {
   className?: string
   size?: number
+  text?: string
 }
 
 export function LoadingSpinner({
   className,
-  size = 48
+  size = 48,
+  text,
 }: LoadingSpinnerProps) {
   return (
-    <div className="w-full h-full flex flex-col items-center justify-center">
+    <div className="w-full h-full flex flex-col items-center justify-center gap-4">
       <div
         className={cn("animate-spin", className)}
         style={{
@@ -24,9 +26,10 @@ export function LoadingSpinner({
           }px), #000 0)`,
           mask: `radial-gradient(farthest-side, #0000 calc(100% - ${
             size / 6
-          }px), #000 0)`
+          }px), #000 0)`,
         }}
       />
+      {text && <p className="text-lg text-muted-foreground">{text}</p>}
     </div>
   )
 } 
