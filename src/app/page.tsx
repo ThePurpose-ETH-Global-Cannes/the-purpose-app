@@ -6,8 +6,11 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ThemeToggle } from '@/components/theme-toggle'
 import Image from 'next/image'
+import Link from 'next/link'
+import { usePrivy } from '@privy-io/react-auth'
 
 export default function Home() {
+  const { ready, authenticated, user, login, logout } = usePrivy()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [youtubeUrl, setYoutubeUrl] = useState('')
   const [error, setError] = useState('')
@@ -18,20 +21,20 @@ export default function Home() {
 
   const isValidYouTubeUrl = (url: string) => {
     if (!url.trim()) return true // Empty URL is valid (no error)
-    
-    const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com\/(watch\?v=|embed\/|v\/)|youtu\.be\/)[\w-]+(&[\w=]*)?$/
+    const youtubeRegex =
+      /^(https?:\/\/)?(www\.)?(youtube\.com\/(watch\?v=|embed\/|v\/)|youtu\.be\/)[\w-]+(&[\w=]*)?$/
     return youtubeRegex.test(url.trim())
   }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
     setYoutubeUrl(value)
-    
+
     // Clear error when user starts typing
     if (error) {
       setError('')
     }
-    
+
     // Show error for invalid URLs (but not for empty input)
     if (value.trim() && !isValidYouTubeUrl(value)) {
       setError('invalid_url')
@@ -40,51 +43,104 @@ export default function Home() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (!youtubeUrl.trim()) {
       setError('Please paste a valid YouTube URL')
       return
     }
-    
+
     if (!isValidYouTubeUrl(youtubeUrl)) {
       setError('invalid_url')
       return
     }
-    
+
     // Handle valid YouTube URL submission
     console.log('YouTube URL:', youtubeUrl)
     setError('')
   }
 
+  if (!ready) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <p className="text-lg text-muted-foreground">Loading...</p>
+      </div>
+    )
+  }
+
+  if (!authenticated) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center bg-background text-foreground">
+        <header className="absolute top-0 flex w-full items-center justify-between p-4">
+          <div className="flex items-center gap-2">
+            <Image
+              src="/Logo.png"
+              alt="The Purpose"
+              width={24}
+              height={24}
+              className="object-contain"
+            />
+            <span className="font-bold text-xl bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500 text-transparent bg-clip-text whitespace-nowrap">
+              The Purpose
+            </span>
+          </div>
+          <Button variant="ghost" onClick={login}>
+            Sign In
+          </Button>
+        </header>
+        <div className="text-center">
+          <h1 className="text-5xl font-bold">Welcome to The Purpose</h1>
+          <p className="mt-4 text-xl text-muted-foreground">
+            Start your journey with us
+          </p>
+          <Button
+            onClick={login}
+            className="mt-8 bg-purple-600 px-8 py-3 text-lg text-white hover:bg-purple-700"
+          >
+            Sign in with Google
+          </Button>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="flex items-center justify-between p-4 border-b border-border">
+      <header className="sticky top-0 z-50 w-full bg-background flex items-center h-16 px-4">
         <div className="flex items-center gap-3">
           <Button
             variant="ghost"
             size="icon"
             onClick={toggleMenu}
-            className="md:hidden"
+            className="md:hidden h-8 w-8 -ml-2 p-0"
           >
-            {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            {isMenuOpen ? (
+              <X className="h-5 w-5" />
+            ) : (
+              <Menu className="h-5 w-5" />
+            )}
           </Button>
-          
+
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
-              <Image
-                src="/Logo.png"
-                alt="The Purpose"
-                width={20}
-                height={20}
-                className="rounded-full"
-              />
-            </div>
-            <span className="font-semibold text-lg">The Purpose</span>
+            <Image
+              src="/Logo.png"
+              alt="The Purpose"
+              width={24}
+              height={24}
+              className="object-contain"
+            />
+            <Link href="/">
+              <span className="font-bold text-xl bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500 text-transparent bg-clip-text whitespace-nowrap">
+                The Purpose
+              </span>
+            </Link>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 ml-auto">
+          <Button variant="ghost" onClick={logout}>
+            Logout
+          </Button>
           <div className="w-8 h-8 bg-accent rounded-full flex items-center justify-center text-white font-semibold text-sm">
             0
           </div>
@@ -97,22 +153,24 @@ export default function Home() {
       )}
 
       {/* Sidebar */}
-      <div className={`overflow-x-clip fixed left-0 top-0 h-full w-80 bg-sidebar border-r border-sidebar-border z-50 transform transition-transform duration-300 ease-in-out ${
+      <div className={`overflow-x-clip fixed left-0 top-16 h-[calc(100vh-4rem)] w-full max-w-sm bg-sidebar border-r border-sidebar-border z-50 transform transition-transform duration-300 ease-in-out ${
         isMenuOpen ? 'translate-x-0' : '-translate-x-full'
       } md:hidden`}>
         <div className="p-4">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
-                <Image
-                  src="/Logo.png"
-                  alt="The Purpose"
-                  width={20}
-                  height={20}
-                  className="rounded-full"
-                />
-              </div>
-              <span className="font-semibold text-lg">The Purpose</span>
+              <Image
+                src="/Logo.png"
+                alt="The Purpose"
+                width={24}
+                height={24}
+                className="object-contain"
+              />
+              <Link href="/">
+                <span className="font-bold text-xl bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500 text-transparent bg-clip-text whitespace-nowrap">
+                  The Purpose
+                </span>
+              </Link>
             </div>
             <Button variant="ghost" size="icon" onClick={toggleMenu}>
               <X className="h-5 w-5" />
@@ -157,35 +215,39 @@ export default function Home() {
         <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-sidebar-border">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 bg-accent rounded-full flex items-center justify-center text-white font-semibold text-sm">
-              O
+              {user?.google?.name ? user.google.name.charAt(0) : 'U'}
             </div>
-            <span className="font-medium">Otto G</span>
+            <span className="font-medium">
+              {user?.google?.name || 'User'}
+            </span>
           </div>
         </div>
       </div>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col items-center justify-center min-h-[calc(100vh-73px)] px-4">
-        <div className="w-full max-w-2xl mx-auto text-center space-y-8">
+      <main className="flex-1 min-h-screen flex flex-col items-start p-8 pt-16">
+        <div className="w-full max-w-5xl mx-auto text-center mb-8">
           <div className="space-y-4">
             <h1 className="text-4xl md:text-5xl font-bold">
               Welcome to<br />
-              The Purpose
+              The Purpose Web3
             </h1>
-            <p className="text-lg md:text-xl text-muted-foreground">
+            <p className="text-lg md:text-xl text-muted-foreground mb-8">
               Turn YouTube insights into Action
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="w-full max-w-md mx-auto space-y-4">
-            <div className="relative">
+          <form onSubmit={handleSubmit} className="w-full max-w-3xl mx-auto space-y-6">
+            <div className="flex flex-col sm:flex-row items-center gap-3">
               <Input
                 type="url"
                 placeholder="Paste YouTube video URL ..."
                 value={youtubeUrl}
                 onChange={handleInputChange}
-                className={`w-full h-12 pl-4 pr-4 text-base border-2 focus:ring-accent/20 rounded-lg bg-background/50 backdrop-blur-sm ${
-                  error ? 'border-red-500 focus:border-red-500' : 'border-accent/50 focus:border-accent'
+                className={`text-center text-lg border-2 shadow-sm transition-all h-12 w-full dark:bg-gray-800 dark:text-white dark:placeholder-gray-400 ${
+                  error
+                    ? 'border-red-500 focus:border-red-500'
+                    : 'border-purple-400 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 hover:border-purple-600 dark:border-purple-500 dark:focus:ring-purple-400 dark:focus:border-purple-400'
                 }`}
               />
             </div>
@@ -220,7 +282,7 @@ export default function Home() {
           </form>
         </div>
 
-        <footer className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-sm text-muted-foreground">
+        <footer className="hidden">
           <div className="flex items-center">
             <ThemeToggle />
           </div>
