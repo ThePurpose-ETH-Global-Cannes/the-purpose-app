@@ -28,10 +28,10 @@ const generateMetadata = (tokenId: string) => {
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { tokenId: string } }
+  { params }: { params: Promise<{ tokenId: string }> },
 ) {
   try {
-    const { tokenId } = params;
+    const { tokenId } = await params;
 
     // Validate token ID
     if (!tokenId || isNaN(parseInt(tokenId))) {
