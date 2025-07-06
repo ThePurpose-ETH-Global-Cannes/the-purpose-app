@@ -10,6 +10,7 @@ import { Tabs, TabConfig } from "@/components/ui/tabs";
 import { YoutubeEmbed } from "@/components/journey/youtube-embed";
 import { MainLayout } from '@/components/layout/main-layout'
 import { Lightbulb, Target, Sparkles, Users } from "lucide-react";
+import { TransformationView } from "@/components/journey/transformation-view";
 
 type JourneyState = "analyzing" | "loading" | "content";
 
@@ -101,7 +102,7 @@ export default function JourneyPage() {
         value: "transformation",
         label: "Transformation",
         icon: <Sparkles className="w-4 h-4" />,
-        content: <p className="mt-6 text-muted-foreground">Transformation will appear here.</p>
+        content: <TransformationView />
     },
     {
         value: "community",
