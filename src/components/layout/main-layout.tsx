@@ -42,11 +42,15 @@ export function MainLayout({ children }: MainLayoutProps) {
   ]
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen w-full max-w-full overflow-x-hidden">
       <Sidebar items={sidebarItems} />
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col min-w-0 w-full">
         <Header />
-        <main className="flex-1 p-8 pt-6">{children}</main>
+        <main className="flex-1 pt-6 px-4 sm:px-6 lg:px-8 w-full min-w-0 overflow-x-hidden">
+          <div className="w-full max-w-full">
+            {children}
+          </div>
+        </main>
       </div>
     </div>
   )

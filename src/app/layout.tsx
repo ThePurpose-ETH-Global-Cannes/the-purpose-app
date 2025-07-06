@@ -23,12 +23,14 @@ export default function RootLayout({
       <head>
         <ThemeScript />
       </head>
-      <body className={inter.className}>
-        <ThemeProvider>
-          <GlobalProvider>
-            <Providers>{children}</Providers>
-          </GlobalProvider>
-        </ThemeProvider>
+      <body className={`${inter.className} overflow-x-hidden`}>
+        <div className="min-h-screen w-full max-w-full">
+          <ThemeProvider>
+            <GlobalProvider>
+              <Providers>{children}</Providers>
+            </GlobalProvider>
+          </ThemeProvider>
+        </div>
       </body>
     </html>
   );

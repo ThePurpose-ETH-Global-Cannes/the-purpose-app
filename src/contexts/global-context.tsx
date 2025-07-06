@@ -22,13 +22,28 @@ export function GlobalProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const checkDevice = () => {
-      setIsMobile(window.innerWidth < 768)
+      const mobile = window.innerWidth < 768
+      setIsMobile(mobile)
+      // Auto-collapse sidebar on mobile
+      if (mobile) {
+        setIsSidebarCollapsed(true)
+      }
     }
 
+    // Initial check
     checkDevice()
-    window.addEventListener("resize", checkDevice)
+    
+    // Add event listener with debounce
+    let timeoutId: NodeJS.Timeout
+    const debouncedCheck = () => {
+      clearTimeout(timeoutId)
+      timeoutId = setTimeout(checkDevice, 100)
+    }
+
+    window.addEventListener("resize", debouncedCheck)
     return () => {
-      window.removeEventListener("resize", checkDevice)
+      window.removeEventListener("resize", debouncedCheck)
+      clearTimeout(timeoutId)
     }
   }, [])
 

@@ -47,7 +47,7 @@ export function Sidebar({
         {/* Overlay with transition */}
         <div
           className={cn(
-            "fixed inset-0 bg-background/80 backdrop-blur-sm transition-opacity duration-300",
+            "fixed inset-0 bg-background/80 backdrop-blur-sm transition-opacity duration-300 z-40",
             isSidebarCollapsed ? "opacity-0 pointer-events-none" : "opacity-100"
           )}
           onClick={() => setIsSidebarCollapsed(true)}
@@ -55,9 +55,9 @@ export function Sidebar({
         {/* Sidebar panel with transition */}
         <aside
           className={cn(
-            "fixed top-16 left-0 z-50 h-[calc(100vh-4rem)] bg-background transition-transform duration-300 ease-in-out",
+            "fixed top-16 left-0 z-50 h-[calc(100vh-4rem)] bg-background transition-transform duration-300 ease-in-out border-r",
             isSidebarCollapsed ? "-translate-x-full" : "translate-x-0",
-            "w-full max-w-sm"
+            "w-full max-w-xs"
           )}
         >
           <div className="flex flex-col h-full">
@@ -79,7 +79,7 @@ export function Sidebar({
                         : "text-muted-foreground",
                       !item.isDisabled && "transition-colors hover:text-foreground hover:bg-accent/50",
                       item.isDisabled && "opacity-50",
-                      item.level === 2 && "pl-8" // Use padding-left instead of margin-left
+                      item.level === 2 && "pl-8"
                     )}
                   >
                     {item.icon && <div className="flex-shrink-0"><item.icon className="h-4 w-4" /></div>}
@@ -107,9 +107,8 @@ export function Sidebar({
   return (
     <aside
       className={cn(
-        "h-full bg-background transition-all duration-300 overflow-hidden",
-        isMobile ? "hidden" : "flex-shrink-0",
-        isSidebarCollapsed ? "w-16" : "w-64",
+        "h-screen bg-background transition-all duration-300 overflow-hidden border-r flex-shrink-0",
+        isSidebarCollapsed ? "w-0" : "w-64",
         className
       )}
     >
@@ -132,7 +131,7 @@ export function Sidebar({
                       : "text-muted-foreground",
                     !item.isDisabled && "transition-colors hover:text-foreground hover:bg-sidebar-accent/50",
                     item.isDisabled && "opacity-50",
-                    item.level === 2 && "pl-8" // Use padding-left instead of margin-left
+                    item.level === 2 && "pl-8"
                   )}
                 >
                   {item.icon && <div className="flex-shrink-0"><item.icon className="h-4 w-4" /></div>}

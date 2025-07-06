@@ -59,7 +59,7 @@ export default function JourneyPage() {
   const renderLoadingState = (text: string) => (
     <MainLayout>
       <div className="w-full h-full flex flex-col items-center justify-center pt-24 px-4">
-        <h1 className="text-2xl font-bold tracking-tight mb-4 text-center">
+        <h1 className="text-2xl font-bold tracking-tight mb-4 text-center max-w-full">
             Remi Colin I Verify Identities Onchain Using Self SDK I ETHGlobal Cannes 2025
         </h1>
         <LoadingSpinner text={text} />
@@ -80,12 +80,12 @@ export default function JourneyPage() {
         value: "key-concepts",
         label: "Key Concepts",
         content: (
-            <div className="mt-6">
+            <div className="mt-6 w-full max-w-full">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <h2 className="text-xl font-bold">Key Concepts</h2>
                     <Button className="w-full sm:w-auto">Now Set Your Goal</Button>
                 </div>
-                <Markdown content={streamedContent} className="mt-4" />
+                <Markdown content={streamedContent} className="mt-4 w-full max-w-full overflow-x-hidden" />
             </div>
         )
     },
@@ -103,38 +103,44 @@ export default function JourneyPage() {
 
   return (
     <MainLayout>
-        <div className="w-full max-w-4xl mx-auto p-4 md:p-6">
-            <h1 className="text-2xl md:text-3xl font-bold tracking-tight mb-4">
-                Remi Colin I Verify Identities Onchain Using Self SDK I ETHGlobal Cannes 2025
-            </h1>
-            <Button variant="outline" size="sm" onClick={() => setShowVideo(!showVideo)} className="mb-4">
-                {showVideo ? 'Hide Video' : 'Show Video'}
-            </Button>
-            {showVideo && <YoutubeEmbed embedId={journeyId} />}
+      <div className="w-full max-w-full overflow-x-hidden">
+        <h1 className="text-2xl md:text-3xl font-bold tracking-tight mb-4 break-words">
+            Remi Colin I Verify Identities Onchain Using Self SDK I ETHGlobal Cannes 2025
+        </h1>
+        <Button variant="outline" size="sm" onClick={() => setShowVideo(!showVideo)} className="mb-4">
+            {showVideo ? 'Hide Video' : 'Show Video'}
+        </Button>
+        {showVideo && (
+          <div className="w-full max-w-full overflow-hidden">
+            <YoutubeEmbed embedId={journeyId} />
+          </div>
+        )}
 
-            <div className="my-6">
-                <div className="flex items-center gap-2 sm:gap-4">
-                    <div className="flex-shrink-0">
-                      <div className="relative w-16 h-16">
-                          <div className="absolute inset-0 rounded-full bg-purple-600/20 flex items-center justify-center">
-                              <div className="w-12 h-12 rounded-full bg-purple-600/30 flex items-center justify-center">
-                                  <span className="text-2xl">✨</span>
-                              </div>
-                          </div>
-                          <div className="absolute top-0 right-0 transform -translate-x-1/2 -translate-y-1/2 bg-primary text-primary-foreground rounded-full h-6 w-6 flex items-center justify-center text-xs font-bold">
-                              1
+        <div className="my-6 w-full max-w-full">
+            <div className="flex items-center gap-2 sm:gap-4">
+                <div className="flex-shrink-0">
+                  <div className="relative w-16 h-16">
+                      <div className="absolute inset-0 rounded-full bg-purple-600/20 flex items-center justify-center">
+                          <div className="w-12 h-12 rounded-full bg-purple-600/30 flex items-center justify-center">
+                              <span className="text-2xl">✨</span>
                           </div>
                       </div>
-                    </div>
-                    <div className="w-full">
-                        <Progress value={14} className="h-2.5" />
-                        <p className="text-sm text-muted-foreground mt-2 text-right">0/7 Levels Complete</p>
-                    </div>
+                      <div className="absolute top-0 right-0 transform -translate-x-1/2 -translate-y-1/2 bg-primary text-primary-foreground rounded-full h-6 w-6 flex items-center justify-center text-xs font-bold">
+                          1
+                      </div>
+                  </div>
+                </div>
+                <div className="w-full min-w-0 flex-1">
+                    <Progress value={14} className="h-2.5" />
+                    <p className="text-sm text-muted-foreground mt-2 text-right">0/7 Levels Complete</p>
                 </div>
             </div>
-            
-            <Tabs tabs={tabs} defaultValue="key-concepts" />
         </div>
+        
+        <div className="w-full max-w-full overflow-x-hidden">
+          <Tabs tabs={tabs} defaultValue="key-concepts" />
+        </div>
+      </div>
     </MainLayout>
   );
 } 

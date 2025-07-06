@@ -4,7 +4,7 @@ interface YoutubeEmbedProps {
 
 export function YoutubeEmbed({ embedId }: YoutubeEmbedProps) {
   return (
-    <div className="aspect-w-16 aspect-h-9">
+    <div className="relative w-full max-w-full aspect-video overflow-hidden">
       <iframe
         width="100%"
         height="100%"
@@ -12,7 +12,7 @@ export function YoutubeEmbed({ embedId }: YoutubeEmbedProps) {
         title="YouTube video player"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowFullScreen
-        className="rounded-lg"
+        className="absolute inset-0 w-full h-full rounded-lg"
       ></iframe>
     </div>
   );
