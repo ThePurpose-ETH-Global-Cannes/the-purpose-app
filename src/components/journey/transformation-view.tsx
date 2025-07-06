@@ -13,6 +13,7 @@ import { Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { Level3Modal } from "@/components/level-3/level-3-modal";
+import { useGlobal } from "@/contexts/global-context";
 
 type LevelStatus = "completed" | "in-progress" | "locked";
 
@@ -22,51 +23,6 @@ interface Level {
   description: string;
   status: LevelStatus;
 }
-
-const levelsData: Level[] = [
-    {
-        level: 1,
-        title: "Replay & Take Notes",
-        description: "Find what hits you in the video.",
-        status: "completed",
-    },
-    {
-        level: 2,
-        title: "Write & Reflect",
-        description: "Journal your insights into clarity.",
-        status: "completed",
-    },
-    {
-        level: 3,
-        title: "Connect & Match",
-        description: "A new way to meet, match, and grow with purpose-driven peers.",
-        status: "in-progress",
-    },
-    {
-        level: 4,
-        title: "Act",
-        description: "Take a small, meaningful action.",
-        status: "locked",
-    },
-    {
-        level: 5,
-        title: "Team Up",
-        description: "Gain insights from others.",
-        status: "locked",
-    },
-    {
-        level: 6,
-        title: "Test Yourself",
-        description: "Show your progress to inspire others.",
-        status: "locked",
-    },
-    {
-        level: 7,
-        title: "Mentor & Complete",
-        description: "Get verified by your team.",
-        status: "locked",
-    },
-];
 
 const StatusBadge = ({ status }: { status: LevelStatus }) => {
   if (status === "locked") return null;
@@ -89,7 +45,13 @@ const StatusBadge = ({ status }: { status: LevelStatus }) => {
 
 export function TransformationView({ userLevel = 3 }: { userLevel?: number }) {
   const [isLevel3ModalOpen, setIsLevel3ModalOpen] = useState(false);
-  
+  const { levels, completeLevel } = useGlobal();
+
+  const handleCompleteLevel = (levelNumber: number) => {
+    completeLevel(levelNumber);
+    setIsLevel3ModalOpen(false);
+  };
+
   const handleLevelClick = (level: Level) => {
     if (level.level === 3) {
       setIsLevel3ModalOpen(true);
@@ -104,7 +66,7 @@ export function TransformationView({ userLevel = 3 }: { userLevel?: number }) {
       <div className="space-y-4 mt-6">
         <h2 className="text-xl font-bold">Your 7-Level Transformation</h2>
         <div className="space-y-4">
-          {levelsData.map((level) => (
+          {levels.map((level) => (
             <Card
               key={level.level}
               className={cn(
@@ -144,7 +106,7 @@ export function TransformationView({ userLevel = 3 }: { userLevel?: number }) {
           ))}
         </div>
       </div>
-      <Level3Modal open={isLevel3ModalOpen} onOpenChange={setIsLevel3ModalOpen} />
+      <Level3Modal open={isLevel3ModalOpen} onOpenChange={setIsLevel3ModalOpen} handleCompleteLevel={() => handleCompleteLevel(3)} />
     </>
   );
 } 
