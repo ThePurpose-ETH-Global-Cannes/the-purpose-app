@@ -11,6 +11,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useState } from "react";
+import { Level3Modal } from "@/components/level-3/level-3-modal";
 
 type LevelStatus = "completed" | "in-progress" | "locked";
 
@@ -36,7 +38,7 @@ const levelsData: Level[] = [
     },
     {
         level: 3,
-        title: "Connect & Match (Coming Soon)",
+        title: "Connect & Match",
         description: "A new way to meet, match, and grow with purpose-driven peers.",
         status: "in-progress",
     },
@@ -86,54 +88,63 @@ const StatusBadge = ({ status }: { status: LevelStatus }) => {
 };
 
 export function TransformationView({ userLevel = 3 }: { userLevel?: number }) {
+  const [isLevel3ModalOpen, setIsLevel3ModalOpen] = useState(false);
+  
   const handleLevelClick = (level: Level) => {
-    // TODO: Handle navigation to level details
-    console.log(`Navigating to level ${level.level}`);
+    if (level.level === 3) {
+      setIsLevel3ModalOpen(true);
+    } else {
+        // TODO: Handle navigation to level details
+        console.log(`Navigating to level ${level.level}`);
+    }
   };
 
   return (
-    <div className="space-y-4 mt-6">
-      <h2 className="text-xl font-bold">Your 7-Level Transformation</h2>
-      <div className="space-y-4">
-        {levelsData.map((level) => (
-          <Card
-            key={level.level}
-            className={cn(
-              level.status !== "locked" && "cursor-pointer transition-all hover:shadow-lg",
-              level.status === "locked" && "bg-muted/50",
-              level.level === userLevel && "border-primary ring-1 ring-primary",
-              "!py-4"
-            )}
-            onClick={() => level.status !== "locked" && handleLevelClick(level)}
-          >
-            <CardHeader>
-                <CardTitle>Level {level.level}: {level.title}</CardTitle>
-                <CardDescription>{level.description}</CardDescription>
-                <CardAction>
-                    <StatusBadge status={level.status} />
-                </CardAction>
-            </CardHeader>
-            <CardContent>
-              {level.status === "completed" && (
-                <Button variant="outline" onClick={(e) => { e.stopPropagation(); handleLevelClick(level); }}>
-                  Review Level
-                </Button>
+    <>
+      <div className="space-y-4 mt-6">
+        <h2 className="text-xl font-bold">Your 7-Level Transformation</h2>
+        <div className="space-y-4">
+          {levelsData.map((level) => (
+            <Card
+              key={level.level}
+              className={cn(
+                level.status !== "locked" && "cursor-pointer transition-all hover:shadow-lg",
+                level.status === "locked" && "bg-muted/50",
+                level.level === userLevel && "border-primary ring-1 ring-primary",
+                "!py-4"
               )}
-              {level.status === "in-progress" && (
-                <Button onClick={(e) => { e.stopPropagation(); handleLevelClick(level); }}>
-                  Start Level
-                </Button>
-              )}
-              {level.status === "locked" && (
-                <div className="flex items-center text-sm text-muted-foreground">
-                  <Lock className="mr-2 h-4 w-4" />
-                  Complete previous level to unlock
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        ))}
+              onClick={() => level.status !== "locked" && handleLevelClick(level)}
+            >
+              <CardHeader>
+                  <CardTitle>Level {level.level}: {level.title}</CardTitle>
+                  <CardDescription>{level.description}</CardDescription>
+                  <CardAction>
+                      <StatusBadge status={level.status} />
+                  </CardAction>
+              </CardHeader>
+              <CardContent>
+                {level.status === "completed" && (
+                  <Button variant="outline" onClick={(e) => { e.stopPropagation(); handleLevelClick(level); }}>
+                    Review Level
+                  </Button>
+                )}
+                {level.status === "in-progress" && (
+                  <Button onClick={(e) => { e.stopPropagation(); handleLevelClick(level); }}>
+                    Start Level
+                  </Button>
+                )}
+                {level.status === "locked" && (
+                  <div className="flex items-center text-sm text-muted-foreground">
+                    <Lock className="mr-2 h-4 w-4" />
+                    Complete previous level to unlock
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </div>
-    </div>
+      <Level3Modal open={isLevel3ModalOpen} onOpenChange={setIsLevel3ModalOpen} />
+    </>
   );
 } 
