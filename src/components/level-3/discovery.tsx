@@ -114,7 +114,7 @@ export default function DiscoveryFeed({ setStep }: DiscoveryFeedProps) {
       {/* Profile Card */}
       <div className="max-w-sm mx-auto px-4">
         <Card
-          className={`bg-card border-border p-6 mb-8 !gap-1 transition-transform duration-300 ${isAnimating ? 'scale-95 opacity-50' : 'scale-100 opacity-100'}`}
+          className={`bg-card border-border p-6 mb-8 transition-transform duration-300 ${isAnimating ? 'scale-95 opacity-50' : 'scale-100 opacity-100'}`}
           onClick={handleViewDetails}
         >
           {/* Avatar and Name */}

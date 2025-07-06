@@ -63,39 +63,41 @@ export default function ConnectCollaborate({ setStep }: ConnectCollaborateProps)
 
         <div className="space-y-8">
 
-          <Card className="bg-card border-border px-3 md:px-6 !gap-2">
-            <div className="flex justify-between items-center">
-              <div>
-                <h3 className="text-lg font-medium">Select discoverability preferences</h3>
-                <p className="text-sm text-zinc-400">Allow others to find and connect with you</p>
-              </div>
-              <button
-                onClick={() => setDiscoverabilityEnabled(!discoverabilityEnabled)}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${discoverabilityEnabled ? 'bg-purple-600' : 'bg-zinc-600'
-                  }`}
-              >
-                <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${discoverabilityEnabled ? 'translate-x-6' : 'translate-x-1'
+          <Card className="bg-card border-border px-3 md:px-6">
+            <div className="flex flex-col gap-2">
+              <div className="flex justify-between items-center">
+                <div>
+                  <h3 className="text-lg font-medium">Select discoverability preferences</h3>
+                  <p className="text-sm text-zinc-400">Allow others to find and connect with you</p>
+                </div>
+                <button
+                  onClick={() => setDiscoverabilityEnabled(!discoverabilityEnabled)}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${discoverabilityEnabled ? 'bg-purple-600' : 'bg-zinc-600'
                     }`}
-                />
-              </button>
-            </div>
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${discoverabilityEnabled ? 'translate-x-6' : 'translate-x-1'
+                      }`}
+                  />
+                </button>
+              </div>
 
-            <div className="flex justify-between items-center">
-              <div>
-                <h3 className="text-lg font-medium">Highlight Key Goal</h3>
-                <p className="text-sm text-zinc-400">Show your primary goal to potential connections</p>
-              </div>
-              <button
-                onClick={() => setHighlightKeyGoal(!highlightKeyGoal)}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${highlightKeyGoal ? 'bg-purple-600' : 'bg-zinc-600'
-                  }`}
-              >
-                <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${highlightKeyGoal ? 'translate-x-6' : 'translate-x-1'
+              <div className="flex justify-between items-center">
+                <div>
+                  <h3 className="text-lg font-medium">Highlight Key Goal</h3>
+                  <p className="text-sm text-zinc-400">Show your primary goal to potential connections</p>
+                </div>
+                <button
+                  onClick={() => setHighlightKeyGoal(!highlightKeyGoal)}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${highlightKeyGoal ? 'bg-purple-600' : 'bg-zinc-600'
                     }`}
-                />
-              </button>
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${highlightKeyGoal ? 'translate-x-6' : 'translate-x-1'
+                      }`}
+                  />
+                </button>
+              </div>
             </div>
           </Card>
 
@@ -128,13 +130,15 @@ export default function ConnectCollaborate({ setStep }: ConnectCollaborateProps)
           </Card>
 
           <Card className="bg-card border-border px-3 md:px-6">
-            <h3 className="text-lg font-medium">Brief BIO for connection</h3>
-            <Textarea
-              placeholder="Write a short bio about what you hope to gain from connecting with others..."
-              value={bio}
-              onChange={(e) => setBio(e.target.value)}
-              maxLength={maxLength}
-            />
+            <div className="flex flex-col gap-2">
+              <h3 className="text-lg font-medium">Brief BIO for connection</h3>
+              <Textarea
+                placeholder="Write a short bio about what you hope to gain from connecting with others..."
+                value={bio}
+                onChange={(e) => setBio(e.target.value)}
+                maxLength={maxLength}
+              />
+            </div>
           </Card>
 
           <div className="flex justify-center">

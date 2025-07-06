@@ -47,12 +47,12 @@ export default function Connections({ setStep }: ConnectionProps) {
 
   const [mutualMatches, setMutualMatches] = useState<MutualMatch[]>([
     {
-      id: 1,
+      id: 4,
       name: "Andrew Wilson",
       avatar: '/discovery-feed/user-4.jpg'
     },
     {
-      id: 2,
+      id: 5,
       name: "Emily Johnson",
       avatar: '/discovery-feed/user-1.jpg'
     }
@@ -61,7 +61,7 @@ export default function Connections({ setStep }: ConnectionProps) {
   const handleAcceptRequest = (requestId: number) => {
     const request = connectionRequests.find(req => req.id === requestId)
     if (request) {
-      setMutualMatches([...mutualMatches, { id: request.id, name: request.name }])
+      setMutualMatches([...mutualMatches, { ...request }])
       setConnectionRequests(connectionRequests.filter(req => req.id !== requestId))
     }
   }
@@ -95,7 +95,7 @@ export default function Connections({ setStep }: ConnectionProps) {
             ) : (
               <div className="space-y-3">
                 {connectionRequests.map((request) => (
-                  <Card key={request.id} className={`bg-card border-border rounded-lg p-4 !gap-1 transition-transform duration-300`}>
+                  <Card key={request.id} className={`bg-card border-border rounded-lg p-4 transition-transform duration-300`}>
                     <div className="flex items-start space-x-3">
                       <div className="w-12 h-12 bg-zinc-700 rounded-full flex items-center justify-center flex-shrink-0">
                         <Image src={request.avatar || '/discovery-feed/user-1.jpg'} alt="User Avatar" className='rounded-full' width={48} height={48} />
@@ -136,7 +136,7 @@ export default function Connections({ setStep }: ConnectionProps) {
             ) : (
               <div className="space-y-3">
                 {mutualMatches.map((match) => (
-                  <Card key={match.id} className={`bg-card border-border rounded-lg p-4 !gap-1 transition-transform duration-300`}>
+                  <Card key={match.id} className={`bg-card border-border rounded-lg p-4 transition-transform duration-300`}>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">
                         <div className="w-12 h-12 bg-zinc-700 rounded-full flex items-center justify-center">
