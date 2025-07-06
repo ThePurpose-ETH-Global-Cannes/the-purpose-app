@@ -121,7 +121,7 @@ export default function JourneyPage() {
                                   <span className="text-2xl">✨</span>
                               </div>
                           </div>
-                          <div className="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 bg-primary text-primary-foreground rounded-full h-6 w-6 flex items-center justify-center text-xs font-bold">
+                          <div className="absolute top-0 right-0 transform -translate-x-1/2 -translate-y-1/2 bg-primary text-primary-foreground rounded-full h-6 w-6 flex items-center justify-center text-xs font-bold">
                               1
                           </div>
                       </div>

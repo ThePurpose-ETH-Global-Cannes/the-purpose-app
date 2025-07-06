@@ -9,6 +9,12 @@ import { usePrivy } from '@privy-io/react-auth'
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { MainLayout } from '@/components/layout/main-layout'
 
+const getYouTubeVideoId = (url: string): string | null => {
+  const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e|embed)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
+  const match = url.match(regex);
+  return match ? match[1] : null;
+};
+
 interface VideoMetadata {
   url: string;
   title: string;
@@ -107,8 +113,19 @@ export default function Home() {
       return
     }
     
-    const videoId = new URL(youtubeUrl).searchParams.get("v")
+    const videoId = getYouTubeVideoId(youtubeUrl);
     if (videoId) {
+      fetch('/api/youtube-transcript', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ videoUrl: youtubeUrl }),
+      }).catch(err => {
+        // We can log this to a service later
+        console.error("Error calling transcript API:", err)
+      })
+
       router.push(`/journeys/${videoId}`)
     } else {
       setError('Could not extract video ID from the URL.')
