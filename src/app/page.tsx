@@ -41,11 +41,9 @@ export default function Home() {
   const router = useRouter()
 
   const isValidYouTubeUrl = (url: string) => {
-    if (!url.trim()) return true // Empty URL is valid (no error)
-    const youtubeRegex =
-      /^(https?:\/\/)?(www\.)?(youtube\.com\/(watch\?v=|embed\/|v\/)|youtu\.be\/)[\w-]+(&[\w=]*)?$/
-    return youtubeRegex.test(url.trim())
-  }
+    if (!url.trim()) return true; // Empty URL is valid (no error)
+    return getYouTubeVideoId(url) !== null;
+  };
 
   useEffect(() => {
     const fetchMetadata = async () => {
