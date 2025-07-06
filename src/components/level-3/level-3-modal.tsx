@@ -13,6 +13,8 @@ const DialogPortal = DialogPrimitive.Portal
 const DialogOverlay = DialogPrimitive.Overlay
 const DialogContent = DialogPrimitive.Content
 const DialogClose = DialogPrimitive.Close
+const DialogTitle = DialogPrimitive.Title
+const DialogDescription = DialogPrimitive.Description
 
 const maxStepsInLevel = 3
 
@@ -40,8 +42,12 @@ export function Level3Modal({ open, onOpenChange }: { open: boolean, onOpenChang
                             </DialogClose>
                         </div>
                         <div className="mt-4 max-w-2xl mx-auto">
-                            <h2 className="text-lg font-bold">Level 3: Connect & Match</h2>
-                            <p className="text-sm text-muted-foreground">How to Build Better Habits</p>
+                            <DialogTitle asChild>
+                                <h2 className="text-lg font-bold">Level 3: Connect & Match</h2>
+                            </DialogTitle>
+                            <DialogDescription asChild>
+                                <p className="text-sm text-muted-foreground">How to Build Better Habits</p>
+                            </DialogDescription>
                             <div className="flex items-center gap-2 mt-2">
                                 <Progress value={progressValue} className="h-1.5" />
                                 <span className="text-sm text-muted-foreground">{step}/{maxStepsInLevel}</span>
