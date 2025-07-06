@@ -24,26 +24,33 @@ const Tabs = React.forwardRef<
   TabsProps
 >(({ tabs, className, ...props }, ref) => {
   const tabListRef = React.useRef<HTMLDivElement>(null)
-  const [showLeftScroll, setShowLeftScroll] = React.useState(false)
-  const [showRightScroll, setShowRightScroll] = React.useState(false)
+  const [hasOverflow, setHasOverflow] = React.useState(false)
+  const [canScrollLeft, setCanScrollLeft] = React.useState(false)
+  const [canScrollRight, setCanScrollRight] = React.useState(false)
 
   const checkScroll = React.useCallback(() => {
     const el = tabListRef.current
     if (!el) return
 
-    const hasOverflow = el.scrollWidth > el.clientWidth
-    const atStart = el.scrollLeft <= 0
-    const atEnd = el.scrollLeft >= el.scrollWidth - el.clientWidth
+    const isOverflowing = el.scrollWidth > el.clientWidth
+    setHasOverflow(isOverflowing)
 
-    setShowLeftScroll(hasOverflow && !atStart)
-    setShowRightScroll(hasOverflow && !atEnd)
+    if (isOverflowing) {
+      const atStart = el.scrollLeft <= 0
+      const atEnd = Math.ceil(el.scrollLeft) >= el.scrollWidth - el.clientWidth
+      setCanScrollLeft(!atStart)
+      setCanScrollRight(!atEnd)
+    } else {
+      setCanScrollLeft(false)
+      setCanScrollRight(false)
+    }
   }, [])
 
   React.useEffect(() => {
     checkScroll()
     window.addEventListener('resize', checkScroll)
     return () => window.removeEventListener('resize', checkScroll)
-  }, [checkScroll])
+  }, [checkScroll, tabs])
 
   const scroll = (direction: 'left' | 'right') => {
     const el = tabListRef.current
@@ -69,13 +76,13 @@ const Tabs = React.forwardRef<
       <div className="relative">
         <div className="flex items-center">
           <div
-            className="relative w-full overflow-hidden px-8"
-            onScroll={handleScroll}
+            className="relative w-full overflow-hidden"
           >
             <TabsPrimitive.List
               ref={tabListRef}
-              className="flex items-center gap-2 overflow-x-auto scrollbar-none"
+              className="flex items-center gap-2 overflow-x-auto scrollbar-none px-8"
               style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+              onScroll={handleScroll}
             >
               {tabs.map((tab) => (
                 <TabsPrimitive.Trigger
@@ -97,25 +104,27 @@ const Tabs = React.forwardRef<
               ))}
             </TabsPrimitive.List>
           </div>
-          {(showLeftScroll || showRightScroll) && (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="vnzk-left-scroll absolute left-0 z-10 h-8 w-8 rounded-full bg-background/80 backdrop-blur-sm shadow-sm"
-              onClick={() => scroll('left')}
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-          )}
-          {(showLeftScroll || showRightScroll) && (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="vnzk-right-scroll absolute right-0 z-10 h-8 w-8 rounded-full bg-background/80 backdrop-blur-sm shadow-sm"
-              onClick={() => scroll('right')}
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
+          {hasOverflow && (
+            <>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute left-0 z-10 h-8 w-8 rounded-full bg-background/80 backdrop-blur-sm transition-opacity duration-300 hover:bg-background"
+                onClick={() => scroll('left')}
+                disabled={!canScrollLeft}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute right-0 z-10 h-8 w-8 rounded-full bg-background/80 backdrop-blur-sm transition-opacity duration-300 hover:bg-background"
+                onClick={() => scroll('right')}
+                disabled={!canScrollRight}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </>
           )}
         </div>
       </div>
