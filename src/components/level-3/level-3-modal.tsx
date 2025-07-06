@@ -16,9 +16,9 @@ const DialogClose = DialogPrimitive.Close
 const DialogTitle = DialogPrimitive.Title
 const DialogDescription = DialogPrimitive.Description
 
-const maxStepsInLevel = 3
+const maxStepsInLevel = 1
 
-export function Level3Modal({ open, onOpenChange }: { open: boolean, onOpenChange: (open: boolean) => void }) {
+export function Level3Modal({ open, onOpenChange, handleCompleteLevel }: { open: boolean, onOpenChange: (open: boolean) => void, handleCompleteLevel: () => void }) {
     const [step, setStep] = useState(1)
     const progressValue = (step / maxStepsInLevel) * 100
 
@@ -54,7 +54,7 @@ export function Level3Modal({ open, onOpenChange }: { open: boolean, onOpenChang
                             </div>
                         </div>
                     </header>
-                    <Level3 step={step} setStep={setStep} />
+                    <Level3 step={step} setStep={setStep} handleCompleteLevel={handleCompleteLevel} />
                 </DialogContent>
             </DialogPortal>
         </Dialog>

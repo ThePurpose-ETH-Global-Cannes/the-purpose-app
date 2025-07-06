@@ -19,9 +19,10 @@ interface MutualMatch {
 
 interface ConnectionProps {
   setStep: (step: number) => void
+  handleCompleteLevel: () => void;
 }
 
-export default function Connections({ setStep }: ConnectionProps) {
+export default function Connections({ setStep, handleCompleteLevel }: ConnectionProps) {
 
   const [connectionRequests, setConnectionRequests] = useState<ConnectionRequest[]>([
     {
@@ -172,10 +173,10 @@ export default function Connections({ setStep }: ConnectionProps) {
           <div className="col-span-1">
             <Button
               variant={"secondary"}
-              onClick={() => setStep(1)}
+              onClick={handleCompleteLevel}
               className="w-full py-6 text-base rounded-lg font-medium hover:bg-zinc-600 transition-colors cursor-pointer"
             >
-              Edit Connection Profile
+              Finish
             </Button>
           </div>
         </div>

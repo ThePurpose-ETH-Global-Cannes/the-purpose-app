@@ -1,39 +1,28 @@
 'use client'
-import ConnectCollaborate from "./connect-collaborate"
-import DiscoveryFeed from "./discovery"
-import Connections from "./connections"
+import ConnectCollaborate from './connect-collaborate'
 
-const maxStepsInLevel = 3
+const maxStepsInLevel = 1
 
 interface Level3Props {
     step: number;
     setStep: (step: number) => void;
+    handleCompleteLevel: () => void;
 }
 
-export function Level3({ step, setStep }: Level3Props) {
+export function Level3({ step, setStep, handleCompleteLevel }: Level3Props) {
     const handleNextStep = async () => {
         if (step < maxStepsInLevel) {
             setStep(step + 1)
         } else {
-            // handleCompleteLevel()
+            handleCompleteLevel()
         }
     }
 
-    const handleSteps = (step: number) => {
-        setStep(step)
-    }
-
     return (
-        <div className="flex-1 overflow-y-auto p-4">
-            <div className="max-w-4xl mx-auto">
-                {step === 1 &&
+        <div className="flex-1 overflow-y-auto p-6">
+            <div className="container mx-auto">
+                {step === 1 && (
                     <ConnectCollaborate setStep={handleNextStep} />
-                }
-                {step === 2 && (
-                    <DiscoveryFeed setStep={handleNextStep} />
-                )}
-                {step === 3 && (
-                    <Connections setStep={handleSteps} />
                 )}
             </div>
         </div>
